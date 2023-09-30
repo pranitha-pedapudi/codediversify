@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+struct Node {
+    char data;
+    struct Node* next;
+};
+struct Node* createNode(char data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+void insertNode(struct Node** head, char data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        newNode->next = newNode; 
+        *head = newNode;
+    } else {
+        struct Node* last = *head;
+        while (last->next != *head) {
+            last = last->next;
+        }
+        last->next = newNode;
+        newNode->next = *head;
+    }
+}
+char playGame() {
+    printf("Enter your choice (R for Rock, P for Paper, S for Scissors): ");
+    char playerChoice;
+    scanf(" %c", &playerChoice);
+    playerChoice = toupper(playerChoice);
+    if (playerChoice != 'R' && playerChoice != 'P' && playerChoice != 'S') {
+        printf("Invalid choice. Please choose R, P, or S.\n");
+        return playGame(); 
+    }
+    srand(time(NULL));
+    char choices[] = {'R', 'P', 'S'};
+    char computerChoice = choices[rand() % 3];
+    printf("Computer chose: %c\n", computerChoice);
+    if (playerChoice == computerChoice)
+        return 'T'; 
+    else if ((playerChoice == 'R' && computerChoice == 'S') ||
+             (playerChoice == 'P' && computerChoice == 'R') ||
+             (playerChoice == 'S' && computerChoice == 'P'))
+        return 'W'; 
+    else
+        return 'L'; 
+}
+int main() {
+    struct Node* head = NULL;
+    char result;
+    do {
+        result = playGame();
+        if (result == 'W') {
+            printf("You win!\n");
+            insertNode(&head, 'W');
+        } else if (result == 'L') {
+            printf("You lose!\n");
+            insertNode(&head, 'L');
+        } else {
+            printf("It's a tie!\n");
+            insertNode(&head, 'T');
+        }
+        printf("Play again? (Y/N): ");
+        char playAgain;
+        scanf(" %c", &playAgain);
+        if (playAgain != 'Y' && playAgain != 'y') {
+            break;
+        }
+    } while (1);
+    printf("Game history: ");
+    struct Node* current = head;
+    if (current != NULL) {
+        do {
+            printf("%c ", current->data);
+            current = current->next;
+        } while (current != head);
+    }
+    return 0;
+}
